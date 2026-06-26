@@ -6,15 +6,15 @@ export const SITE = {
   github: 'https://github.com/praxiscodes',
 };
 
-export const NAV_LINKS = [
+export interface NavLink {
+  label: string;
+  href: string;
+  external?: boolean;
+}
+
+export const NAV_LINKS: NavLink[] = [
   { label: 'Home', href: '/' },
-  { label: 'Research Notes', href: '/research/' },
-  { label: 'Implementations', href: '/implementations/' },
-  { label: 'Projects', href: '/projects/' },
-  { label: 'Reading List', href: '/reading/' },
-  { label: 'About', href: '/about/' },
-  { label: 'GitHub', href: SITE.github, external: true },
-  { label: 'RSS', href: '/rss.xml' },
+  { label: 'Blog', href: '/research/' },
 ];
 
 export const INVESTIGATIONS = [
