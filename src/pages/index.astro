@@ -4,10 +4,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 
 <BaseLayout title={SITE.title} description={SITE.description} pathname={Astro.url.pathname}>
-  <section class="max-w-reading border border-border bg-[#060606] p-7 sm:p-9">
-    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">Home</p>
-    <h1 class="mt-3 text-3xl font-semibold tracking-tight text-text sm:text-4xl">
-      praxis, understanding intelligence by building it
-    </h1>
+  <section class="max-w-3xl space-y-2">
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-muted">Research notebook</p>
+    <h1 class="text-4xl font-semibold tracking-[0.2em] text-text sm:text-5xl">PRAXIS</h1>
+    <p class="max-w-2xl text-lg text-muted">Understanding intelligence by building it.</p>
   </section>
 </BaseLayout>
