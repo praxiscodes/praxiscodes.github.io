@@ -1,0 +1,48 @@
+---
+import { getCollection } from 'astro:content';
+import StatusBadge from '../../components/StatusBadge.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate } from '../../utils/content';
+
+const implementations = [...(await getCollection('implementations'))].sort((a, b) => {
+  const left = a.data.order ?? Number.POSITIVE_INFINITY;
+  const right = b.data.order ?? Number.POSITIVE_INFINITY;
+  return left - right;
+});
+---
+
+<BaseLayout
+  title="Implementations | Praxis"
+  description="Implementation log for core reinforcement learning and world model systems."
+  pathname={Astro.url.pathname}
+>
+  <section class="mb-8 max-w-3xl">
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">Systems</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-text sm:text-4xl">Implementations</h1>
+    <p class="mt-4 text-base leading-relaxed text-muted">
+      Ongoing reproductions and ground-up builds that translate papers into working systems.
+    </p>
+  </section>
+
+  <div class="grid gap-4 md:grid-cols-2">
+    {implementations.map((entry) => (
+      <article class="surface-border bg-[#060606] p-5">
+        <div class="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-semibold text-text">{entry.data.title}</h2>
+            <p class="mt-1 text-xs uppercase tracking-[0.08em] text-muted">{formatDate(entry.data.pubDate)}</p>
+          </div>
+          <StatusBadge status={entry.data.status} />
+        </div>
+        <p class="text-sm leading-relaxed text-muted">{entry.data.description}</p>
+        {entry.data.tags.length > 0 && (
+          <ul class="mt-4 flex flex-wrap gap-2">
+            {entry.data.tags.map((tag) => (
+              <li class="border border-border px-2 py-1 font-mono text-[0.68rem] text-muted">{tag}</li>
+            ))}
+          </ul>
+        )}
+      </article>
+    ))}
+  </div>
+</BaseLayout>

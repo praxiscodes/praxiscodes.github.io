@@ -1,0 +1,44 @@
+---
+interface LinkedArticle {
+  href: string;
+  title: string;
+}
+
+interface Props {
+  newer?: LinkedArticle;
+  older?: LinkedArticle;
+}
+
+const { newer, older } = Astro.props;
+---
+
+{(newer || older) && (
+  <nav class="mt-14 grid gap-4 border-t border-border pt-8 sm:grid-cols-2" aria-label="Article navigation">
+    <div>
+      {newer ? (
+        <a class="group block border border-border p-4 hover:border-[#343434]" href={newer.href}>
+          <p class="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted">Previous</p>
+          <p class="mt-2 text-sm text-text group-hover:text-white">{newer.title}</p>
+        </a>
+      ) : (
+        <div class="h-full border border-border p-4 opacity-40">
+          <p class="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted">Previous</p>
+          <p class="mt-2 text-sm text-muted">No newer note</p>
+        </div>
+      )}
+    </div>
+    <div>
+      {older ? (
+        <a class="group block border border-border p-4 hover:border-[#343434]" href={older.href}>
+          <p class="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted">Next</p>
+          <p class="mt-2 text-sm text-text group-hover:text-white">{older.title}</p>
+        </a>
+      ) : (
+        <div class="h-full border border-border p-4 opacity-40">
+          <p class="font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted">Next</p>
+          <p class="mt-2 text-sm text-muted">No older note</p>
+        </div>
+      )}
+    </div>
+  </nav>
+)}

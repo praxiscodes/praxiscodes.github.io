@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import StatusBadge from '../../components/StatusBadge.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, sortByNewest } from '../../utils/content';
+
+const projects = sortByNewest(await getCollection('projects'));
+---
+
+<BaseLayout
+  title="Projects | Praxis"
+  description="Long-cycle projects emerging from research investigations."
+  pathname={Astro.url.pathname}
+>
+  <section class="mb-8 max-w-3xl">
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">Build Cycle</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-text sm:text-4xl">Projects</h1>
+    <p class="mt-4 text-base leading-relaxed text-muted">
+      Larger systems that evolve from repeated implementation work and prolonged reading loops.
+    </p>
+  </section>
+
+  <div class="space-y-4">
+    {projects.map((entry) => (
+      <article class="surface-border bg-[#060606] p-5">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div class="max-w-3xl">
+            <h2 class="text-lg font-semibold text-text">{entry.data.title}</h2>
+            <p class="mt-1 text-xs uppercase tracking-[0.08em] text-muted">{formatDate(entry.data.pubDate)}</p>
+            <p class="mt-3 text-sm leading-relaxed text-muted">{entry.data.description}</p>
+          </div>
+          <StatusBadge status={entry.data.status} />
+        </div>
+        <div class="mt-4 flex flex-wrap gap-2">
+          {entry.data.tags.map((tag) => (
+            <span class="border border-border px-2 py-1 font-mono text-[0.68rem] text-muted">{tag}</span>
+          ))}
+          {entry.data.link && (
+            <a
+              class="border border-border px-2 py-1 font-mono text-[0.68rem] text-text hover:border-[#383838]"
+              href={entry.data.link}
+              target="_blank"
+              rel="noreferrer"
+            >
+              External
+            </a>
+          )}
+        </div>
+      </article>
+    ))}
+  </div>
+</BaseLayout>

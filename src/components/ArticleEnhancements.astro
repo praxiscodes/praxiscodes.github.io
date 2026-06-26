@@ -1,0 +1,115 @@
+<script>
+  const setupCopyButtons = () => {
+    const blocks = document.querySelectorAll('pre');
+
+    for (const block of blocks) {
+      if (!(block instanceof HTMLElement) || block.dataset.copyReady === 'true') {
+        continue;
+      }
+
+      const code = block.querySelector('code');
+
+      if (!code || code.classList.contains('language-mermaid')) {
+        continue;
+      }
+
+      block.dataset.copyReady = 'true';
+
+      const button = document.createElement('button');
+      button.className = 'copy-code-btn';
+      button.type = 'button';
+      button.textContent = 'Copy';
+
+      button.addEventListener('click', async () => {
+        const codeText = code.textContent ?? '';
+
+        try {
+          await navigator.clipboard.writeText(codeText);
+          button.textContent = 'Copied';
+          window.setTimeout(() => {
+            button.textContent = 'Copy';
+          }, 1400);
+        } catch {
+          button.textContent = 'Failed';
+          window.setTimeout(() => {
+            button.textContent = 'Copy';
+          }, 1400);
+        }
+      });
+
+      block.append(button);
+    }
+  };
+
+  const setupMermaid = async () => {
+    const mermaidNodes = Array.from(
+      document.querySelectorAll('pre code.language-mermaid'),
+    ) as HTMLElement[];
+
+    if (mermaidNodes.length === 0) {
+      return;
+    }
+
+    const mermaidModule = await import('mermaid');
+    const mermaid = mermaidModule.default;
+
+    mermaid.initialize({
+      startOnLoad: false,
+      securityLevel: 'loose',
+      theme: 'dark',
+    });
+
+    for (const node of mermaidNodes) {
+      const pre = node.closest('pre');
+
+      if (!pre || pre.dataset.mermaidReady === 'true') {
+        continue;
+      }
+
+      pre.dataset.mermaidReady = 'true';
+
+      const wrapper = document.createElement('div');
+      wrapper.className = 'mermaid-wrap';
+
+      const container = document.createElement('div');
+      container.className = 'mermaid';
+      container.textContent = node.textContent ?? '';
+
+      wrapper.append(container);
+      pre.replaceWith(wrapper);
+    }
+
+    await mermaid.run({
+      nodes: Array.from(document.querySelectorAll('.mermaid')),
+    });
+  };
+
+  const setupImageZoom = async () => {
+    const images = document.querySelectorAll('.article-content img');
+
+    if (images.length === 0) {
+      return;
+    }
+
+    const { default: mediumZoom } = await import('medium-zoom');
+
+    mediumZoom(images as NodeListOf<HTMLImageElement>, {
+      background: '#050505',
+      margin: 28,
+    });
+  };
+
+  const initializeEnhancements = async () => {
+    setupCopyButtons();
+    await setupMermaid();
+    await setupImageZoom();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      void initializeEnhancements();
+    });
+  } else {
+    void initializeEnhancements();
+  }
+</script>

@@ -1,0 +1,26 @@
+---
+title: The Mathematics of Reinforcement Learning
+description: Bellman operators, contraction intuition, and where approximation bends the theory.
+pubDate: 2026-06-09
+tags:
+  - reinforcement learning
+  - bellman equation
+  - theory
+featured: false
+---
+
+The Bellman operator explains almost everything in RL dynamics:
+
+$$
+(\mathcal{T}V)(s)=\max_a\left[r(s,a)+\gamma\sum_{s'}P(s'\mid s,a)V(s')\right]
+$$
+
+In tabular settings, $\mathcal{T}$ is a contraction under the sup norm, giving a unique fixed point $V^*$.
+
+Approximation breaks this clean guarantee:
+
+- Function classes may not contain the fixed point.
+- Bootstrapping amplifies representation mismatch.
+- Off-policy data shifts the effective operator.
+
+Most practical stability heuristics are attempts to recover enough contraction behavior to keep learning coherent.

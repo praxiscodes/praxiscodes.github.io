@@ -1,0 +1,102 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import ArticleEnhancements from '../../components/ArticleEnhancements.astro';
+import ArticlePager from '../../components/ArticlePager.astro';
+import BackToTop from '../../components/BackToTop.astro';
+import ReadingProgress from '../../components/ReadingProgress.astro';
+import TableOfContents from '../../components/TableOfContents.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, getReadingMinutes, sortByNewest } from '../../utils/content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('research', ({ data }) => {
+    return !data.draft;
+  });
+
+  return entries.map((entry) => ({
+    params: { slug: entry.slug },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props as { entry: CollectionEntry<'research'> };
+
+const orderedEntries = sortByNewest(
+  await getCollection('research', ({ data }) => {
+    return !data.draft;
+  }),
+);
+
+const currentIndex = orderedEntries.findIndex((item) => item.id === entry.id);
+const newerEntry = currentIndex > 0 ? orderedEntries[currentIndex - 1] : undefined;
+const olderEntry =
+  currentIndex >= 0 && currentIndex < orderedEntries.length - 1
+    ? orderedEntries[currentIndex + 1]
+    : undefined;
+
+const { Content, headings } = await render(entry);
+const readingMinutes = getReadingMinutes(entry.body);
+---
+
+<BaseLayout
+  title={`${entry.data.title} | Praxis`}
+  description={entry.data.description}
+  pathname={`/research/${entry.slug}/`}
+  type="article"
+  publishedTime={entry.data.pubDate.toISOString()}
+  updatedTime={entry.data.updatedDate?.toISOString()}
+  tags={entry.data.tags}
+>
+  <ReadingProgress />
+
+  <article class="mx-auto max-w-6xl">
+    <header class="mb-10 max-w-reading border-b border-border pb-8">
+      <p class="font-mono text-[0.72rem] uppercase tracking-[0.12em] text-muted">Research note</p>
+      <h1 class="mt-3 text-3xl font-semibold tracking-tight text-text sm:text-4xl">{entry.data.title}</h1>
+      <p class="mt-4 text-base leading-relaxed text-muted">{entry.data.description}</p>
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.08em] text-muted">
+        <span>{formatDate(entry.data.pubDate)}</span>
+        <span aria-hidden="true">/</span>
+        <span>{readingMinutes} min read</span>
+      </div>
+      {entry.data.tags.length > 0 && (
+        <ul class="mt-4 flex flex-wrap gap-2">
+          {entry.data.tags.map((tag) => (
+            <li class="border border-border px-2 py-1 font-mono text-[0.68rem] text-muted">{tag}</li>
+          ))}
+        </ul>
+      )}
+    </header>
+
+    <div class="grid gap-10 lg:grid-cols-[minmax(0,74ch)_260px] lg:items-start">
+      <div class="article-content rich-copy max-w-reading">
+        <Content />
+      </div>
+      <div>
+        <TableOfContents headings={headings} />
+      </div>
+    </div>
+
+    <ArticlePager
+      newer={
+        newerEntry
+          ? {
+              href: `/research/${newerEntry.slug}/`,
+              title: newerEntry.data.title,
+            }
+          : undefined
+      }
+      older={
+        olderEntry
+          ? {
+              href: `/research/${olderEntry.slug}/`,
+              title: olderEntry.data.title,
+            }
+          : undefined
+      }
+    />
+  </article>
+
+  <ArticleEnhancements />
+  <BackToTop />
+</BaseLayout>

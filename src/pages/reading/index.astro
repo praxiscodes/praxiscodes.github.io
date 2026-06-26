@@ -1,0 +1,51 @@
+---
+import { getCollection } from 'astro:content';
+import StatusBadge from '../../components/StatusBadge.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, sortByNewest } from '../../utils/content';
+
+const readingList = sortByNewest(await getCollection('reading'));
+---
+
+<BaseLayout
+  title="Reading List | Praxis"
+  description="Papers, books, and essays in the active intelligence reading queue."
+  pathname={Astro.url.pathname}
+>
+  <section class="mb-8 max-w-3xl">
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">Reference Stack</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-text sm:text-4xl">Reading List</h1>
+    <p class="mt-4 text-base leading-relaxed text-muted">
+      Working bibliography used for derivations, architecture choices, and implementation reviews.
+    </p>
+  </section>
+
+  <div class="space-y-4">
+    {readingList.map((entry) => (
+      <article class="surface-border bg-[#060606] p-5">
+        <div class="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <p class="font-mono text-[0.68rem] uppercase tracking-[0.1em] text-muted">{entry.data.kind}</p>
+            <h2 class="mt-1 text-lg font-semibold text-text">{entry.data.title}</h2>
+            <p class="mt-1 text-sm text-muted">{entry.data.author}</p>
+          </div>
+          <StatusBadge status={entry.data.status} />
+        </div>
+
+        <p class="mt-3 text-sm leading-relaxed text-muted">{entry.data.description}</p>
+
+        <div class="mt-4 flex flex-wrap items-center gap-2 text-xs uppercase tracking-[0.08em] text-muted">
+          <span>{formatDate(entry.data.pubDate)}</span>
+          {entry.data.link && (
+            <>
+              <span aria-hidden="true">/</span>
+              <a href={entry.data.link} target="_blank" rel="noreferrer" class="hover:text-text">
+                Source
+              </a>
+            </>
+          )}
+        </div>
+      </article>
+    ))}
+  </div>
+</BaseLayout>

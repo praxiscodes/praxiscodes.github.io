@@ -1,0 +1,52 @@
+---
+import { getCollection } from 'astro:content';
+import NoteCard from '../../components/NoteCard.astro';
+import ResearchSearch from '../../components/ResearchSearch.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, getReadingMinutes, sortByNewest } from '../../utils/content';
+
+const notes = sortByNewest(
+  await getCollection('research', ({ data }) => {
+    return !data.draft;
+  }),
+);
+---
+
+<BaseLayout
+  title="Research Notes | Praxis"
+  description="Research notes documenting world models, reinforcement learning, representation learning, and AI systems."
+  pathname={Astro.url.pathname}
+>
+  <section class="mb-8 max-w-3xl">
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">Archive</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-text sm:text-4xl">Research Notes</h1>
+    <p class="mt-4 text-base leading-relaxed text-muted">
+      Working notes from paper reconstruction, implementation traces, and mathematical derivations.
+      Search is local and runs entirely in the browser.
+    </p>
+  </section>
+
+  <ResearchSearch />
+
+  <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+    {notes.map((note) => (
+      <NoteCard
+        href={`/research/${note.slug}/`}
+        title={note.data.title}
+        description={note.data.description}
+        pubDate={formatDate(note.data.pubDate)}
+        readingMinutes={getReadingMinutes(note.body)}
+        tags={note.data.tags}
+        slug={note.slug}
+      />
+    ))}
+  </div>
+
+  <p
+    id="research-empty-state"
+    class="surface-border mt-6 hidden bg-[#060606] px-4 py-6 text-sm text-muted"
+    style="display: none;"
+  >
+    No notes match this query yet.
+  </p>
+</BaseLayout>

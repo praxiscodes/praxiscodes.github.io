@@ -1,0 +1,27 @@
+---
+import type { ImplementationStatus } from '../config/site';
+
+interface Props {
+  status: ImplementationStatus | 'Active' | 'Archived' | 'Incubating' | 'Reading' | 'Queued' | 'Revisiting';
+}
+
+const { status } = Astro.props;
+
+const variants: Record<string, string> = {
+  Completed: 'border-[#4a4a4a] text-[#d8d8d8]',
+  'In Progress': 'border-[#6a6a6a] text-[#f0f0f0]',
+  Planned: 'border-border text-muted',
+  Active: 'border-[#6a6a6a] text-[#f0f0f0]',
+  Archived: 'border-border text-muted',
+  Incubating: 'border-[#4a4a4a] text-[#d8d8d8]',
+  Reading: 'border-[#6a6a6a] text-[#f0f0f0]',
+  Queued: 'border-border text-muted',
+  Revisiting: 'border-[#4a4a4a] text-[#d8d8d8]',
+};
+---
+
+<span
+  class={`inline-flex border px-2 py-1 font-mono text-[0.65rem] uppercase tracking-[0.1em] ${variants[status] ?? 'border-border text-muted'}`}
+>
+  {status}
+</span>

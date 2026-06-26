@@ -1,0 +1,33 @@
+---
+title: Understanding RSSMs
+description: Clarifying deterministic and stochastic pathways in recurrent state-space models.
+pubDate: 2026-06-17
+tags:
+  - rssm
+  - recurrent models
+  - latent dynamics
+featured: false
+---
+
+RSSMs combine two signals:
+
+1. A deterministic recurrent memory for long context.
+2. A stochastic latent variable for uncertainty and multimodality.
+
+The deterministic hidden state keeps trajectory continuity, while the stochastic state captures ambiguity.
+
+## Useful decomposition
+
+Let $h_t$ be deterministic and $z_t$ stochastic.
+
+$$
+h_t = f(h_{t-1}, z_{t-1}, a_{t-1}),\qquad z_t \sim p(z_t\mid h_t)
+$$
+
+Posterior inference adds observation conditioning:
+
+$$
+z_t \sim q(z_t\mid h_t, x_t)
+$$
+
+This split keeps imagination stable while still encoding uncertainty.

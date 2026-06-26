@@ -1,0 +1,34 @@
+---
+title: Building a Gridworld World Model
+description: A small deterministic environment that reveals most model-based RL mistakes.
+pubDate: 2026-06-20
+tags:
+  - gridworld
+  - model-based rl
+  - experimentation
+featured: true
+---
+
+Gridworld looks trivial until latent dynamics fail to preserve wall collisions and terminal transitions.
+
+## Why start with Gridworld
+
+- Fully observable.
+- Deterministic transitions.
+- Easy to audit prediction errors step-by-step.
+
+## Practical setup
+
+State is represented as one-hot position plus orientation, with action space `{up, down, left, right}`.
+The world model is a two-layer MLP trained on transition tuples `(s_t, a_t, s_{t+1}, r_t, done_t)`.
+
+## Primary metrics
+
+1. One-step transition accuracy
+2. Multi-step rollout fidelity
+3. Reward prediction precision
+
+## Main failure pattern
+
+Compounding error appears after 8-12 imagined steps, especially near sparse reward boundaries.
+This suggests that short-horizon prediction quality does not imply planning quality.

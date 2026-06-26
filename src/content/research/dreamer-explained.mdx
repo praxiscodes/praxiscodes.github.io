@@ -1,0 +1,25 @@
+---
+title: Dreamer Explained
+description: How policy optimization over imagined trajectories changes sample efficiency.
+pubDate: 2026-06-13
+tags:
+  - dreamer
+  - actor-critic
+  - imagination
+featured: false
+---
+
+Dreamer replaces expensive environment interaction with latent imagination rollouts.
+
+## Core loop
+
+1. Learn world model from replay.
+2. Imagine trajectories inside latent space.
+3. Optimize actor and critic on imagined trajectories.
+4. Collect fresh data and repeat.
+
+The gain comes from reusing each real interaction many times through model-based rollouts.
+
+## Watchpoint
+
+If value estimates become overconfident in imagined states, policy quality drops quickly in the real environment.

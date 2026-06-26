@@ -1,0 +1,110 @@
+<section class="surface-border mb-8 bg-[#060606] p-4">
+  <label class="mb-2 block font-mono text-[0.7rem] uppercase tracking-[0.1em] text-muted" for="research-search-input">
+    Local Search
+  </label>
+  <input
+    id="research-search-input"
+    class="w-full border border-border bg-bg px-3 py-2 text-sm text-text placeholder:text-muted focus:border-[#3a3a3a] focus:outline-none"
+    placeholder="Search notes, concepts, equations, and experiments"
+    type="search"
+    autocomplete="off"
+  />
+  <p class="mt-2 text-xs text-muted" id="research-search-count">Indexing notes...</p>
+</section>
+
+<script>
+  import Fuse from 'fuse.js';
+
+  const searchInput = document.getElementById('research-search-input');
+  const searchCount = document.getElementById('research-search-count');
+  const emptyState = document.getElementById('research-empty-state');
+  const noteCards = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-note-slug]'),
+  );
+
+  let indexedNotes: Array<{
+    slug: string;
+    title: string;
+    description: string;
+    tags: string[];
+    content: string;
+  }> = [];
+
+  let fuse: Fuse<(typeof indexedNotes)[number]> | null = null;
+
+  const showCards = (slugs: Set<string>) => {
+    let visibleCount = 0;
+
+    for (const card of noteCards) {
+      const slug = card.dataset.noteSlug;
+      const visible = Boolean(slug && slugs.has(slug));
+      card.style.display = visible ? 'block' : 'none';
+
+      if (visible) {
+        visibleCount += 1;
+      }
+    }
+
+    if (emptyState) {
+      emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    if (searchCount) {
+      searchCount.textContent = `${visibleCount} ${visibleCount === 1 ? 'result' : 'results'}`;
+    }
+  };
+
+  const runSearch = (query: string) => {
+    if (!fuse || query.trim().length === 0) {
+      const allSlugs = new Set(indexedNotes.map((note) => note.slug));
+      showCards(allSlugs);
+
+      if (searchCount) {
+        searchCount.textContent = `${indexedNotes.length} notes indexed`;
+      }
+
+      return;
+    }
+
+    const matches = fuse.search(query).map((result) => result.item.slug);
+    showCards(new Set(matches));
+  };
+
+  const bootstrap = async () => {
+    try {
+      const response = await fetch('/search-index.json');
+      const payload = await response.json();
+
+      indexedNotes = payload
+        .filter((entry: { kind: string }) => entry.kind === 'research')
+        .map((entry: { slug: string; title: string; description: string; tags: string[]; content: string }) => ({
+          slug: entry.slug,
+          title: entry.title,
+          description: entry.description,
+          tags: entry.tags,
+          content: entry.content,
+        }));
+
+      fuse = new Fuse(indexedNotes, {
+        includeScore: true,
+        threshold: 0.34,
+        ignoreLocation: true,
+        keys: ['title', 'description', 'tags', 'content'],
+      });
+
+      runSearch('');
+    } catch {
+      if (searchCount) {
+        searchCount.textContent = 'Search unavailable';
+      }
+    }
+  };
+
+  if (searchInput instanceof HTMLInputElement) {
+    searchInput.addEventListener('input', () => {
+      runSearch(searchInput.value);
+    });
+  }
+
+  void bootstrap();
+</script>

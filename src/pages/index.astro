@@ -1,0 +1,90 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import NoteCard from '../components/NoteCard.astro';
+import StatusBadge from '../components/StatusBadge.astro';
+import { INVESTIGATIONS, SITE } from '../config/site';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import bannerImage from '../assets/banner-hands.jpeg';
+import { formatDate, getReadingMinutes, sortByNewest } from '../utils/content';
+
+const notes = sortByNewest(
+  await getCollection('research', ({ data }) => {
+    return !data.draft;
+  }),
+);
+
+const latestNotes = notes.slice(0, 3);
+
+const implementations = [...(await getCollection('implementations'))].sort((a, b) => {
+  const left = a.data.order ?? Number.POSITIVE_INFINITY;
+  const right = b.data.order ?? Number.POSITIVE_INFINITY;
+  return left - right;
+});
+---
+
+<BaseLayout title={SITE.title} description={SITE.description} pathname={Astro.url.pathname}>
+  <section class="mb-12">
+    <Image
+      src={bannerImage}
+      alt="Two monochrome hands reaching toward each other"
+      widths={[720, 1080, 1440]}
+      sizes="(min-width: 1200px) 1200px, 100vw"
+      class="h-[220px] w-full border border-border object-cover sm:h-[300px] lg:h-[380px]"
+      loading="eager"
+      format="webp"
+      quality={85}
+    />
+
+    <div class="mt-9 space-y-2">
+      <p class="font-mono text-[0.72rem] uppercase tracking-[0.16em] text-muted">Research notebook</p>
+      <h1 class="text-4xl font-semibold tracking-[0.2em] text-text sm:text-5xl">PRAXIS</h1>
+      <p class="max-w-2xl text-lg text-muted">Understanding intelligence by building it.</p>
+    </div>
+  </section>
+
+  <section class="mb-12 border-t border-border pt-9">
+    <h2 class="font-mono text-[0.8rem] uppercase tracking-[0.14em] text-muted">Current Investigations</h2>
+    <ul class="mt-4 grid gap-2 text-base text-text sm:grid-cols-2 lg:grid-cols-3">
+      {INVESTIGATIONS.map((topic) => (
+        <li class="surface-border bg-[#060606] px-4 py-3">{topic}</li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="mb-12 border-t border-border pt-9">
+    <div class="mb-5 flex items-end justify-between gap-4">
+      <h2 class="font-mono text-[0.8rem] uppercase tracking-[0.14em] text-muted">Latest Research Notes</h2>
+      <a class="text-xs uppercase tracking-[0.08em] text-muted hover:text-text" href="/research/">View all</a>
+    </div>
+
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      {latestNotes.map((note) => (
+        <NoteCard
+          href={`/research/${note.slug}/`}
+          title={note.data.title}
+          description={note.data.description}
+          pubDate={formatDate(note.data.pubDate)}
+          readingMinutes={getReadingMinutes(note.body)}
+          tags={note.data.tags}
+          slug={note.slug}
+        />
+      ))}
+    </div>
+  </section>
+
+  <section class="border-t border-border pt-9">
+    <h2 class="font-mono text-[0.8rem] uppercase tracking-[0.14em] text-muted">Current Implementations</h2>
+    <div class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      {implementations.map((entry) => (
+        <article class="surface-border bg-[#060606] p-4">
+          <div class="mb-3 flex items-center justify-between gap-3">
+            <h3 class="text-base font-medium text-text">{entry.data.title}</h3>
+            <StatusBadge status={entry.data.status} />
+          </div>
+          <p class="text-sm leading-relaxed text-muted">{entry.data.description}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

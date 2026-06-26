@@ -1,0 +1,22 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const description =
+  'Praxis documents a first-principles study of intelligence through mathematical intuition and systems implementation.';
+---
+
+<BaseLayout title="About | Praxis" description={description} pathname={Astro.url.pathname}>
+  <section class="max-w-reading border border-border bg-[#060606] p-7 sm:p-9">
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">About</p>
+    <h1 class="mt-3 text-3xl font-semibold tracking-tight text-text">Praxis</h1>
+    <p class="mt-5 text-base leading-relaxed text-muted">
+      Praxis is a long-term research identity focused on understanding intelligence from first principles.
+      The work blends mathematical intuition, replication of core papers, and implementation-heavy
+      experimentation to expose where modern AI systems truly succeed and fail.
+    </p>
+    <p class="mt-5 text-base leading-relaxed text-muted">
+      This archive is intentionally minimal: no resume, no timeline, no testimonials. Only research
+      notes, implementation logs, and reading traces that compound over years.
+    </p>
+  </section>
+</BaseLayout>

@@ -1,0 +1,20 @@
+<button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top">
+  Top
+</button>
+
+<script is:inline>
+  const backToTop = document.getElementById('back-to-top');
+
+  if (backToTop) {
+    const toggleVisibility = () => {
+      backToTop.dataset.visible = window.scrollY > 500 ? 'true' : 'false';
+    };
+
+    toggleVisibility();
+    window.addEventListener('scroll', toggleVisibility, { passive: true });
+
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  }
+</script>

@@ -1,0 +1,111 @@
+---
+import { Image } from 'astro:assets';
+import SeoHead from '../components/SeoHead.astro';
+import { NAV_LINKS, SITE } from '../config/site';
+import profileImage from '../assets/profile-aizen.jpeg';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  pathname?: string;
+  image?: string;
+  type?: 'website' | 'article';
+  publishedTime?: string;
+  updatedTime?: string;
+  tags?: string[];
+}
+
+const {
+  title,
+  description,
+  pathname = Astro.url.pathname,
+  image,
+  type,
+  publishedTime,
+  updatedTime,
+  tags,
+} = Astro.props;
+
+const normalizedPathname = pathname.endsWith('/') || pathname.includes('.') ? pathname : `${pathname}/`;
+
+const isLinkActive = (href: string) => {
+  if (href.startsWith('http')) {
+    return false;
+  }
+
+  if (href.includes('.')) {
+    return normalizedPathname === href;
+  }
+
+  if (href === '/') {
+    return normalizedPathname === '/';
+  }
+
+  return normalizedPathname.startsWith(href);
+};
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <SeoHead
+      title={title}
+      description={description}
+      pathname={pathname}
+      image={image}
+      type={type}
+      publishedTime={publishedTime}
+      updatedTime={updatedTime}
+      tags={tags}
+    />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="border-b border-border">
+        <div class="mx-auto max-w-6xl px-4 pb-4 pt-6 sm:px-6 lg:px-8">
+          <div class="mb-5 flex items-center justify-between gap-4">
+            <a href="/" class="text-base font-semibold tracking-[0.25em] text-text">
+              {SITE.name}
+            </a>
+            <div class="flex items-center gap-3">
+              <p class="hidden text-xs uppercase tracking-[0.08em] text-muted sm:block">Research archive</p>
+              <Image
+                src={profileImage}
+                alt="Praxis profile"
+                width={34}
+                height={34}
+                class="h-[34px] w-[34px] border border-border object-cover grayscale opacity-70"
+                loading="eager"
+              />
+            </div>
+          </div>
+
+          <nav class="flex flex-wrap gap-x-4 gap-y-2 text-[0.72rem] uppercase tracking-[0.1em] text-muted">
+            {NAV_LINKS.map((link) => (
+              <a
+                class={isLinkActive(link.href) ? 'text-text' : 'hover:text-text'}
+                href={link.href}
+                target={link.external ? '_blank' : undefined}
+                rel={link.external ? 'noreferrer' : undefined}
+              >
+                {link.label}
+              </a>
+            ))}
+          </nav>
+        </div>
+      </header>
+
+      <main class="fade-enter mx-auto w-full max-w-6xl px-4 pb-20 pt-8 sm:px-6 lg:px-8">
+        <slot />
+      </main>
+
+      <footer class="border-t border-border">
+        <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-2 px-4 py-5 text-xs uppercase tracking-[0.08em] text-muted sm:px-6 lg:px-8">
+          <p>{new Date().getFullYear()} Praxis Research Notebook</p>
+          <p>Built with Astro + Tailwind</p>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

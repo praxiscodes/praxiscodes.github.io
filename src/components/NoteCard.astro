@@ -1,0 +1,35 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  description: string;
+  pubDate: string;
+  readingMinutes: number;
+  tags?: string[];
+  slug: string;
+}
+
+const { href, title, description, pubDate, readingMinutes, tags = [], slug } = Astro.props;
+---
+
+<article
+  class="surface-border bg-[#060606] p-5 transition-colors duration-150 hover:border-[#323232]"
+  data-note-slug={slug}
+>
+  <a href={href} class="group block">
+    <h3 class="text-lg font-semibold tracking-tight text-text group-hover:text-white">{title}</h3>
+    <p class="mt-2 text-sm leading-relaxed text-muted">{description}</p>
+    <div class="mt-4 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.08em] text-muted">
+      <span>{pubDate}</span>
+      <span aria-hidden="true">/</span>
+      <span>{readingMinutes} min read</span>
+    </div>
+    {tags.length > 0 && (
+      <ul class="mt-4 flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <li class="border border-border px-2 py-1 font-mono text-[0.7rem] text-muted">{tag}</li>
+        ))}
+      </ul>
+    )}
+  </a>
+</article>

@@ -1,0 +1,175 @@
+@import '@fontsource/ibm-plex-sans/400.css';
+@import '@fontsource/ibm-plex-sans/500.css';
+@import '@fontsource/ibm-plex-sans/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import 'katex/dist/katex.min.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --bg: #050505;
+  --text: #eaeaea;
+  --muted: #9a9a9a;
+  --border: #1b1b1b;
+  --code: #101010;
+}
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+body {
+  font-family: 'IBM Plex Sans', ui-sans-serif, sans-serif;
+  letter-spacing: 0.002em;
+}
+
+::selection {
+  background: #2d2d2d;
+  color: #ffffff;
+}
+
+a {
+  color: inherit;
+}
+
+.page-shell {
+  @apply min-h-screen bg-bg text-text;
+}
+
+.surface-border {
+  border: 1px solid var(--border);
+}
+
+.faded-text {
+  color: var(--muted);
+}
+
+.rich-copy {
+  @apply prose prose-invert max-w-none;
+  --tw-prose-body: #d7d7d7;
+  --tw-prose-headings: #f3f3f3;
+  --tw-prose-lead: #c2c2c2;
+  --tw-prose-links: #f3f3f3;
+  --tw-prose-bold: #f3f3f3;
+  --tw-prose-counters: #8f8f8f;
+  --tw-prose-bullets: #6f6f6f;
+  --tw-prose-hr: #1b1b1b;
+  --tw-prose-quotes: #e5e5e5;
+  --tw-prose-quote-borders: #323232;
+  --tw-prose-captions: #8f8f8f;
+  --tw-prose-code: #f5f5f5;
+  --tw-prose-pre-code: #eaeaea;
+  --tw-prose-pre-bg: #101010;
+  --tw-prose-th-borders: #2a2a2a;
+  --tw-prose-td-borders: #1f1f1f;
+}
+
+.rich-copy h2,
+.rich-copy h3 {
+  scroll-margin-top: 7rem;
+}
+
+.rich-copy pre {
+  @apply relative overflow-x-auto rounded-none border border-border bg-code;
+}
+
+.rich-copy pre code {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 0.84rem;
+}
+
+.rich-copy code {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  border: 1px solid #232323;
+  border-radius: 0;
+  padding: 0.15rem 0.35rem;
+  font-size: 0.85em;
+  background: #0f0f0f;
+}
+
+.rich-copy code::before,
+.rich-copy code::after {
+  content: '';
+}
+
+.rich-copy img {
+  border: 1px solid var(--border);
+}
+
+.rich-copy table {
+  width: 100%;
+  display: table;
+}
+
+.heading-anchor {
+  @apply ml-2 text-muted no-underline opacity-0 transition-opacity duration-150;
+}
+
+h2:hover .heading-anchor,
+h3:hover .heading-anchor,
+h4:hover .heading-anchor {
+  @apply opacity-100;
+}
+
+.markdown-alert {
+  @apply my-6 border border-border bg-code px-4 py-3;
+}
+
+.markdown-alert-title {
+  @apply mb-2 font-semibold uppercase tracking-[0.08em] text-text;
+}
+
+.markdown-alert-note {
+  border-color: #2d2d2d;
+}
+
+.markdown-alert-tip {
+  border-color: #3a3a3a;
+}
+
+.markdown-alert-important {
+  border-color: #434343;
+}
+
+.markdown-alert-warning,
+.markdown-alert-caution {
+  border-color: #5a5a5a;
+}
+
+.copy-code-btn {
+  @apply absolute right-3 top-3 border border-border bg-[#0b0b0b] px-2 py-1 text-[0.72rem] uppercase tracking-[0.08em] text-muted transition-colors duration-150;
+}
+
+.copy-code-btn:hover,
+.copy-code-btn:focus-visible {
+  @apply border-[#3d3d3d] text-text;
+}
+
+#reading-progress {
+  @apply fixed left-0 top-0 z-50 h-[2px] w-0 bg-text transition-[width] duration-100;
+}
+
+.back-to-top {
+  @apply fixed bottom-6 right-6 z-40 border border-border bg-bg px-3 py-2 font-mono text-xs uppercase tracking-[0.08em] text-muted opacity-0 transition-opacity duration-200;
+}
+
+.back-to-top[data-visible='true'] {
+  @apply opacity-100;
+}
+
+.fade-enter {
+  animation: fade-in 320ms ease-out both;
+}
+
+.mermaid-wrap {
+  @apply my-8 overflow-x-auto border border-border bg-code p-4;
+}
