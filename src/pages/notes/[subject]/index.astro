@@ -1,0 +1,76 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { formatDate } from '../../../utils/content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('notes', ({ data }) => {
+    return !data.draft;
+  });
+
+  const subjectMap = new Map<string, string>();
+
+  for (const entry of entries) {
+    const [subjectSlug] = entry.slug.split('/');
+
+    if (!subjectSlug || subjectMap.has(subjectSlug)) {
+      continue;
+    }
+
+    subjectMap.set(subjectSlug, entry.data.subject);
+  }
+
+  return Array.from(subjectMap.entries()).map(([subject, subjectTitle]) => ({
+    params: { subject },
+    props: { subject, subjectTitle },
+  }));
+}
+
+const { subject, subjectTitle } = Astro.props as {
+  subject: string;
+  subjectTitle: string;
+};
+
+const chapters = (await getCollection('notes', ({ data }) => {
+  return !data.draft;
+}))
+  .filter((entry) => entry.slug.startsWith(`${subject}/`))
+  .sort((a, b) => {
+    if (a.data.chapter !== b.data.chapter) {
+      return a.data.chapter - b.data.chapter;
+    }
+
+    return a.data.pubDate.getTime() - b.data.pubDate.getTime();
+  });
+---
+
+<BaseLayout
+  title={`${subjectTitle} Notes | Praxis`}
+  description={`Chapters for ${subjectTitle}.`}
+  pathname={`/notes/${subject}/`}
+  image="/og/notes.svg"
+>
+  <section class="mb-8 max-w-3xl">
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">Subject</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-text sm:text-4xl">{subjectTitle}</h1>
+  </section>
+
+  {chapters.length > 0 ? (
+    <div class="max-w-3xl border-y border-border">
+      {chapters.map((chapter) => (
+        <article class="border-b border-border py-4 last:border-b-0">
+          <a class="group block" href={`/notes/${chapter.slug}/`}>
+            <h2 class="text-lg font-semibold tracking-tight text-text group-hover:text-white">
+              Chapter {chapter.data.chapter}: {chapter.data.title}
+            </h2>
+            <p class="mt-1 text-xs uppercase tracking-[0.08em] text-muted">
+              {formatDate(chapter.data.pubDate)}
+            </p>
+          </a>
+        </article>
+      ))}
+    </div>
+  ) : (
+    <p class="max-w-3xl text-sm text-muted">No chapters yet.</p>
+  )}
+</BaseLayout>

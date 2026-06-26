@@ -1,0 +1,72 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+interface SubjectSummary {
+  slug: string;
+  title: string;
+  chapterCount: number;
+}
+
+const entries = await getCollection('notes', ({ data }) => {
+  return !data.draft;
+});
+
+const subjectMap = new Map<string, SubjectSummary>();
+
+for (const entry of entries) {
+  const [subjectSlug] = entry.slug.split('/');
+
+  if (!subjectSlug) {
+    continue;
+  }
+
+  const existing = subjectMap.get(subjectSlug);
+
+  if (existing) {
+    existing.chapterCount += 1;
+    continue;
+  }
+
+  subjectMap.set(subjectSlug, {
+    slug: subjectSlug,
+    title: entry.data.subject,
+    chapterCount: 1,
+  });
+}
+
+const subjects = Array.from(subjectMap.values()).sort((a, b) =>
+  a.title.localeCompare(b.title),
+);
+---
+
+<BaseLayout
+  title="Notes | Praxis"
+  description="Structured notes organized by subject and chapter."
+  pathname={Astro.url.pathname}
+  image="/og/notes.svg"
+>
+  <section class="mb-8 max-w-3xl">
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">Notes</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-text sm:text-4xl">Notes</h1>
+  </section>
+
+  {subjects.length > 0 ? (
+    <div class="max-w-3xl border-y border-border">
+      {subjects.map((subject) => (
+        <article class="border-b border-border py-4 last:border-b-0">
+          <a class="group block" href={`/notes/${subject.slug}/`}>
+            <h2 class="text-lg font-semibold tracking-tight text-text group-hover:text-white">
+              {subject.title}
+            </h2>
+            <p class="mt-1 text-xs uppercase tracking-[0.08em] text-muted">
+              {subject.chapterCount} {subject.chapterCount === 1 ? 'chapter' : 'chapters'}
+            </p>
+          </a>
+        </article>
+      ))}
+    </div>
+  ) : (
+    <p class="max-w-3xl text-sm text-muted">No subjects yet.</p>
+  )}
+</BaseLayout>

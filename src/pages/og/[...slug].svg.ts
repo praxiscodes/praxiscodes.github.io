@@ -39,6 +39,12 @@ const STATIC_CARDS: Array<CardProps & { slug: string }> = [
     subtitle: 'The references behind current investigations.',
   },
   {
+    slug: 'notes',
+    section: 'Notes',
+    title: 'Subjects and chaptered notes',
+    subtitle: 'Structured notes for deep dives across core AI domains.',
+  },
+  {
     slug: 'about',
     section: 'About',
     title: 'Praxis research identity',

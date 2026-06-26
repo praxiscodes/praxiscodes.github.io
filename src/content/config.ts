@@ -55,9 +55,18 @@ const reading = defineCollection({
   }),
 });
 
+const notes = defineCollection({
+  type: 'content',
+  schema: baseSchema.extend({
+    subject: z.string(),
+    chapter: z.number().int().positive(),
+  }),
+});
+
 export const collections = {
   research,
   implementations,
   projects,
   reading,
+  notes,
 };

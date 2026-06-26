@@ -1,0 +1,92 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import ArticleEnhancements from '../../../components/ArticleEnhancements.astro';
+import BackToTop from '../../../components/BackToTop.astro';
+import ReadingProgress from '../../../components/ReadingProgress.astro';
+import TableOfContents from '../../../components/TableOfContents.astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { formatDate, getReadingMinutes } from '../../../utils/content';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('notes', ({ data }) => {
+    return !data.draft;
+  });
+
+  return entries.flatMap((entry) => {
+    const parts = entry.slug.split('/');
+
+    if (parts.length !== 2) {
+      return [];
+    }
+
+    const [subject, chapter] = parts;
+
+    return [
+      {
+        params: { subject, chapter },
+        props: { entry },
+      },
+    ];
+  });
+}
+
+const { entry } = Astro.props as {
+  entry: CollectionEntry<'notes'>;
+};
+
+const [subjectSlug] = entry.slug.split('/');
+const { Content, headings } = await render(entry);
+const readingMinutes = getReadingMinutes(entry.body);
+---
+
+<BaseLayout
+  title={`${entry.data.title} | Praxis Notes`}
+  description={entry.data.description}
+  pathname={`/notes/${entry.slug}/`}
+  type="article"
+  publishedTime={entry.data.pubDate.toISOString()}
+  updatedTime={entry.data.updatedDate?.toISOString()}
+  tags={entry.data.tags}
+  image="/og/notes.svg"
+>
+  <ReadingProgress />
+
+  <article class="mx-auto max-w-6xl">
+    <header class="mb-10 max-w-reading border-b border-border pb-8">
+      <a
+        class="font-mono text-[0.72rem] uppercase tracking-[0.12em] text-muted hover:text-text"
+        href={`/notes/${subjectSlug}/`}
+      >
+        Notes / {entry.data.subject}
+      </a>
+      <h1 class="mt-3 text-3xl font-semibold tracking-tight text-text sm:text-4xl">
+        Chapter {entry.data.chapter}: {entry.data.title}
+      </h1>
+      <p class="mt-4 text-base leading-relaxed text-muted">{entry.data.description}</p>
+      <div class="mt-5 flex flex-wrap items-center gap-3 text-xs uppercase tracking-[0.08em] text-muted">
+        <span>{formatDate(entry.data.pubDate)}</span>
+        <span aria-hidden="true">/</span>
+        <span>{readingMinutes} min read</span>
+      </div>
+      {entry.data.tags.length > 0 && (
+        <ul class="mt-4 flex flex-wrap gap-2">
+          {entry.data.tags.map((tag) => (
+            <li class="border border-border px-2 py-1 font-mono text-[0.68rem] text-muted">{tag}</li>
+          ))}
+        </ul>
+      )}
+    </header>
+
+    <div class="grid gap-10 lg:grid-cols-[minmax(0,74ch)_260px] lg:items-start">
+      <div class="article-content rich-copy max-w-reading">
+        <Content />
+      </div>
+      <div>
+        <TableOfContents headings={headings} />
+      </div>
+    </div>
+  </article>
+
+  <ArticleEnhancements />
+  <BackToTop />
+</BaseLayout>
