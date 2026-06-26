@@ -1,6 +1,6 @@
 ---
 title: World Models from First Principles
-description: Why latent dynamics matter, and how prediction becomes planning.
+description: understanding world models
 pubDate: 2026-06-24
 tags:
   - world models
@@ -9,64 +9,3 @@ tags:
 featured: true
 ---
 
-World models are not a branding layer over reinforcement learning. They are an explicit attempt to represent **what changes**, **what persists**, and **what can be controlled**.
-
-> [!NOTE]
-> Working hypothesis: compact latent dynamics beat raw pixel policies when data is limited and horizon length is long.
-
-The core objective is usually reconstruction + prediction in latent space:
-
-$$
-\mathcal{L} = \lambda_r \lVert x_t - \hat{x}_t \rVert_2^2 + \lambda_p\,\mathrm{KL}\left(q(z_t\mid x_{\le t}, a_{<t})\;\|\;p(z_t\mid z_{t-1}, a_{t-1})\right)
-$$
-
-When this objective is tuned correctly, planning becomes:
-
-$$
-a_t = \arg\max_{a_t} \mathbb{E}_{p(z_{t+1:T}\mid z_t, a_{t:T-1})}\left[\sum_{k=t}^{T} \gamma^{k-t} r_k\right]
-$$
-
-## Minimal system view
-
-```mermaid
-flowchart LR
-  O[Observation x_t] --> E[Encoder]
-  E --> Z[Latent z_t]
-  Z --> D[Dynamics p(z_t|z_{t-1},a_{t-1})]
-  Z --> R[Reward head]
-  Z --> V[Value head]
-  D --> Z
-```
-
-## Implementation notes
-
-| Layer | Role | Failure mode |
-| --- | --- | --- |
-| Encoder | Compresses observations | Aliases visually similar states |
-| Dynamics | Predicts latent transitions | Drift under long rollouts |
-| Decoder | Grounds latent space | Overfits texture, ignores control |
-| Policy/Planner | Chooses actions | Exploits model errors |
-
-```python
-for step in range(train_steps):
-    batch = replay.sample()
-    z_post, z_prior = rssm.observe(batch.obs, batch.action)
-    recon_loss = decoder.loss(z_post, batch.obs)
-    kl_loss = kl_divergence(z_post, z_prior)
-    model_loss = recon_loss + beta * kl_loss
-    model_opt.step(model_loss)
-```
-
-The first practical insight: if KL is too weak, the latent space memorizes; if too strong, the latent state collapses.[^collapse]
-
-[^collapse]: Posterior collapse appears when the decoder can reconstruct without informative latent structure.
-
-## Visual reference
-
-![Monochrome hands visualizing latent alignment](/images/hands-banner.jpeg)
-
-## Open questions
-
-1. Which latent regularizers best preserve controllable factors?
-2. Can uncertainty calibration inside the model replace ensemble planning?
-3. How far can compact world models scale without explicit memory?
