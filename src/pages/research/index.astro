@@ -3,7 +3,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { formatDate, sortByNewest } from '../../utils/content';
 
-const notes = sortByNewest(
+const entries = sortByNewest(
   await getCollection('research', ({ data }) => {
     return !data.draft;
   }),
@@ -11,24 +11,24 @@ const notes = sortByNewest(
 ---
 
 <BaseLayout
-  title="Blog | Praxis"
-  description="Blog posts documenting world models, reinforcement learning, representation learning, and AI systems."
+  title="research | praxis"
+  description="research notes on world models, inference systems, and applied optimization workflows."
   pathname={Astro.url.pathname}
 >
   <section class="mb-8 max-w-3xl">
-    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">Blog</p>
-    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-text sm:text-4xl">Blog</h1>
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">research</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-text sm:text-4xl">research</h1>
   </section>
 
   <div class="max-w-3xl border-y border-border">
-    {notes.map((note) => (
+    {entries.map((entry) => (
       <article class="border-b border-border py-4 last:border-b-0">
-        <a class="group block" href={`/research/${note.slug}/`}>
+        <a class="group block" href={`/research/${entry.slug}/`}>
           <h2 class="text-lg font-semibold tracking-tight text-text group-hover:text-white">
-            {note.data.title}
+            {entry.data.title}
           </h2>
           <p class="mt-1 text-xs uppercase tracking-[0.08em] text-muted">
-            {formatDate(note.data.pubDate)}
+            {formatDate(entry.data.pubDate)}
           </p>
         </a>
       </article>

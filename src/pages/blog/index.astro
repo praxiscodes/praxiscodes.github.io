@@ -1,0 +1,45 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { formatDate, sortByNewest } from '../../utils/content';
+
+const entries = sortByNewest(
+  await getCollection('research', ({ data }) => {
+    return !data.draft && data.featured;
+  }),
+);
+---
+
+<BaseLayout
+  title="blog | praxis"
+  description="featured essays and editorial notes from praxis."
+  pathname={Astro.url.pathname}
+>
+  <section class="mb-8 max-w-3xl">
+    <p class="font-mono text-[0.72rem] uppercase tracking-[0.14em] text-muted">blog</p>
+    <h1 class="mt-2 text-3xl font-semibold tracking-tight text-text sm:text-4xl">blog</h1>
+    <p class="mt-3 text-sm leading-relaxed text-muted">
+      featured writing that links into the deeper research archive.
+    </p>
+  </section>
+
+  {entries.length > 0 ? (
+    <div class="max-w-3xl border-y border-border">
+      {entries.map((entry) => (
+        <article class="border-b border-border py-5 last:border-b-0">
+          <a class="group block" href={`/research/${entry.slug}/`}>
+            <h2 class="text-lg font-semibold tracking-tight text-text group-hover:text-white">
+              {entry.data.title}
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-muted">{entry.data.description}</p>
+            <p class="mt-3 text-xs uppercase tracking-[0.08em] text-muted">
+              {formatDate(entry.data.pubDate)}
+            </p>
+          </a>
+        </article>
+      ))}
+    </div>
+  ) : (
+    <p class="max-w-3xl text-sm text-muted">no blog posts yet.</p>
+  )}
+</BaseLayout>
